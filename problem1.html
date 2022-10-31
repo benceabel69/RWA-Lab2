@@ -1,0 +1,156 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Directory</title>
+</head>
+<body>
+    <center>
+        <div id="Error" style="display:none ;">
+
+        </div>
+        <input type="text" id="myInput" placeholder="Search for names.." title="Type in a name">
+        <div id="form" style="background-color:rgba(21, 21, 237, 0.291); width: 40%; padding: 15px;  border-radius: 15px;">
+            <form>
+                <input type="text" name="name" id="name" placeholder="Name" required>
+                <input type="number" name="phone" id="phone" placeholder="Phone Number"  >
+                <input type="email" id="email" placeholder="Email Address" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" required>
+                <input type="submit" id="submit" value="Save">
+            </form>
+        </div>
+        <br>
+        <div id="table" style="background-color:rgba(75, 237, 21, 0.291); width: 40%; padding: 15px;  border-radius: 15px;">
+            <table id="contactTable" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th><Button id="nameBTN" style="border:none ; background-color:transparent; font-size:  22 pt;"><h2>Name</h2></Button></th>
+                        <th><Button id="phoneBTN" style="border:none ; background-color:transparent; font-size:  22 pt;"><h2>Phone</h2></Button></th>
+                        <th><Button id="emailBTN" style="border:none ; background-color:transparent; font-size:  22 pt;"><h2>Email</h2></Button></th>
+                        
+                    </tr>
+                </thead>
+                <p id="none" style="display:none;"></p>
+            </table>
+        </div>
+    </center>
+
+</body>
+<script>
+
+    contact = [] //array to store the contacts
+    var sorted = 0 //check if sorted variable
+
+    document.getElementById("nameBTN").onclick=function(){ //when the name is clicked function
+        var table = document.getElementById("contactTable"); //assignt the table
+        
+        if(sorted==0){ //if table isint sorted 
+            for(var i = table.rows.length - 1; i > 0; i--) //delete all rows 
+            {
+                table.deleteRow(i);
+            }
+            var sortedContact = contact.sort() //sort the table
+            for(var i = 0; i < sortedContact.length; i++){ //insert the sorted array back
+                var row = table.insertRow(-1);
+                var sname = row.insertCell(0);
+                var sphone = row.insertCell(1);
+                var semail = row.insertCell(2);
+                sname.innerHTML = sortedContact[i][0]
+                sphone.innerHTML = sortedContact[i][1]
+                semail.innerHTML = sortedContact[i][2]
+            }
+            sorted++; //append counter
+        }else{ //if table is sorted
+            for(var i = table.rows.length - 1; i > 0; i--) //delete all rows
+            {
+                table.deleteRow(i);
+            }
+            var reverseContact = contact.reverse() //reverse the table
+            for(var i = 0; i < reverseContact.length; i++){ //insert the reversed array back
+                var row = table.insertRow(-1);
+                var rname = row.insertCell(0);
+                var rphone = row.insertCell(1);
+                var remail = row.insertCell(2);
+                rname.innerHTML = reverseContact[i][0]
+                rphone.innerHTML = reverseContact[i][1]
+                remail.innerHTML = reverseContact[i][2]
+            }
+            sorted = 0; //reset counter
+        }
+        
+    }
+
+   
+    document.getElementById("submit").onclick=function() //when user submits contact
+       {
+        nameLGH = document.getElementById("name").value //get the name
+        phoneLGH = document.getElementById("phone").value //get the phone
+        emailLGH = document.getElementById("email").value //get the email
+        error = document.getElementById("Error"); //get the error field
+        if(nameLGH.length > 20 || !isNaN(nameLGH.value) ){ //check name
+            error.style.display = "block";
+            error.innerHTML = "Name Invalid...";
+            return;
+        }else{
+            error.display = "none";
+        }
+
+        if(phoneLGH.length != 10 ){ //check phone
+            error.style.display = "block";
+            error.innerHTML = "Phone Number Invalid...";
+            return;
+        }else{
+            error.display = "none";
+        }
+
+        if(emailLGH.length > 40){ //check email
+            error.style.display = "block";
+            error.innerHTML = "Email Invalid...";
+            return;
+        }else{
+            error.display = "none";
+        }
+        
+        var table = document.getElementById("contactTable"); //get table and insert the cells
+        var row = table.insertRow(-1);
+        var rname = row.insertCell(0);
+        var rphone = row.insertCell(1);
+        var remail = row.insertCell(2);
+        rname.innerHTML = nameLGH
+        rphone.innerHTML = phoneLGH;
+        remail.innerHTML = emailLGH;
+        contact.push( [nameLGH,phoneLGH,emailLGH]);
+        console.log(contact);
+
+        if( error.display == "none"){ //clear all the input fields
+            var inputs = document.querySelectorAll('#name, #phone, #email');
+
+            inputs.forEach(input => {
+
+                input.value = '';
+            });
+        }
+        return false;
+    }
+
+
+    document.getElementById("myInput").onkeyup=function() { //when user searches
+        const table = document.querySelectorAll('#contactTable tr:not(.header)') //select everything from table but the header
+        const filter = document.querySelector('#myInput').value //select users input
+        const regex = new RegExp(filter, 'i') //create regex filter
+        const inTD = td => regex.test(td.innerHTML) //run filter on tds
+        const found = childrenArr => childrenArr.some(inTD) 
+        const setDisplay = ({ style, children }) => {
+            style.display = found([...children ]) ? '' : 'none' //for all the columns
+        }
+        
+        table.forEach(setDisplay) //display the found ones
+        var noneField = document.getElementById("none");
+    // code below is used to check if no results 
+    //    if(table.value == null){ 
+    //     noneField.style.display = "block";
+    //     noneField.innerHTML = "No such field";
+    //    }
+    }
+</script>
+</html>

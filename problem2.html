@@ -1,0 +1,45 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem 2</title>
+    <h1 style="color:red">Open Console To See Output</h1>
+</head>
+<body>
+    <script>
+    //List all of the post titles having more than six words        
+    async function printTitle() {
+            let placeholders = await fetch('https://jsonplaceholder.typicode.com/todos'); //fetch the location
+            let pull = await placeholders.json(); //convert data to JSON
+
+            let titleText = pull.map(pull => pull.title); //map the data title element to titleText
+            titleText.filter(titleText => titleText.split(' ').length > 6) //split the titles and display ones that are bigger than 6 digits
+            titleText.forEach(titleText => console.log(titleText)) //console log each title
+    }
+    printTitle() //call function
+
+    //Show a word frequency map for all of the body contents of the posts
+    async function wordCount() {
+        let placeholders = await fetch('https://jsonplaceholder.typicode.com/posts'); //fetc the location
+        let pull = await placeholders.json(); //convert data to json
+        let bodyWords = pull.map(pull => pull.body); //map the data body element to bodyWords
+        let array = bodyWords.toString(); //convert toString
+        array = array.replace(/"/g, ''); //replace the "
+    
+        const map = {}; //create a map
+        for (let i = 0; i < array.length; i++) { //for loop until the length of the array
+            //if statement to check if word is new or already counted if it is then ++ that counter
+            if (array[i] in map) {
+                map[array[i]]++;
+            }
+            else
+                map[array[i]] = 1;
+        }
+        console.log("################################################################"); //make it easier to see
+        console.log(JSON.stringify(map)); //convert to JSON to log
+    }
+    wordCount() //call function
+    </script>
+</body>
+</html>

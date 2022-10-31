@@ -1,0 +1,181 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Github</title>
+    <style>
+        #userimg{ /* created image in js */
+            height: 200px;
+            width: 200px;
+        }
+        #userlocation, #usergits, #useremail, #usersname, #userusername{ /* all the created elements on left side */
+            text-align: start;
+            padding-left: 5px;
+        }
+        #repoDivs{ /* created element for right side to display repos */
+            text-align: start;
+            padding-left: 5px;
+            border: 1px solid lightgray;
+        }
+        #right{ /* right side of the screen */
+            position: absolute;
+            right:10%;
+            top:10%;
+            height: 600px;
+            width: 35%;
+            border: 1px solid lightgray; 
+            padding: 15px;
+        }
+        #left{ /* left side of the screen */
+            position: absolute;
+            left:10%;
+            top:10%;
+            height: 600px;
+            width: 35%;
+            padding: 15px;
+            border: 1px solid lightgray; 
+        }
+    </style>
+</head>
+<body>
+
+    <center>
+        <!-- this is where the user enters github username -->
+        <div id="selectUser"> 
+            <input id="select" placeholder="Enter Github Username" style="height: 50px; width:140px; border-radius:10px; padding:5px;"/>
+            <button onclick="selectedUser()"  style="height: 50px; width:80px; border-radius:10px; padding:5px;">
+                Show User
+            </button>
+        </div>
+
+        <!-- main body where we will display the informations -->
+        <div id="main" style="width:100vw ;">
+
+            <!-- left side of the panel -->
+            <div id="left" >
+                
+                <div id="img" style="height: 200px; width:200px;  border: 1px solid lightgray;">
+                    <!-- this is where the avatar image will be generated -->
+                </div>
+                
+                <br>
+
+                <div id="name" style=" border: 1px solid lightgray;">
+                    <!-- this is where users name will be generated -->
+                </div>
+
+                <div id="username"  style=" border: 1px solid lightgray;">
+                    <!-- this is where users username will be generated -->
+                </div>
+
+                <div id="email"  style=" border: 1px solid lightgray;">
+                    <!-- this is where users email will be generated -->
+                </div>
+
+                <div id="location"  style=" border: 1px solid lightgray;">
+                    <!-- this is where users location will be generated -->
+                </div>
+
+                <div id="gits"  style=" border: 1px solid lightgray;">
+                    <!-- this is where the users gists will be generated -->
+                </div>
+            </div>
+
+            <!-- right side of the page. div can be left empty the JS will populate it when username is selected -->
+            <div id="right" >
+                
+            </div>
+        </div>
+    </center>
+   
+
+    <script>
+        async function selectedUser(){
+            //left side of the screen
+            var userSelected = document.getElementById("select").value; //grab the GIthub id enetered by the user
+
+            const location = "https://api.github.com/users/" + userSelected ; //this is used for getting the details for the left side
+            let placeholders = await fetch(location); //fetch the Github API
+            let pull = await placeholders.json(); //convert data to JSON
+            
+            //right side of the screen
+            const repoL = "https://api.github.com/users/" + userSelected  + "/repos"; //need this to get the repo names and use that to display then name and description
+            let placeholder = await fetch(repoL); //fetch the Github API for repositories
+            let pulls = await placeholder.json(); //convert data to JSON
+            
+            if(pulls.length > 5){ //this function is used to check if the repos pull has more than 5 items and if so then make the right div scrollable otherwise dont have a scroll
+                document.getElementById("right").style.overflowY="Scroll";
+            }else{
+                document.getElementById("right").style.overflowY="None";
+            }
+            
+            document.getElementById("right").innerHTML = ""; //this is used to clear the right side div 
+
+            for(let i = 0; i < pulls.length; i++){ //for loop to check length of pulls and print out the repo names and descriptions
+                var img = document.createElement('div'); //create the div that will hold this data
+                img.setAttribute("id", "repoDivs"); //assign id to the div
+                img.innerHTML = "Name: " + pulls[i].name ; //get the name of the current loop
+                img.innerHTML += "<br>";
+                img.innerHTML += "Description: " + pulls[i].description; //get the description of the current loop
+                document.getElementById("right").appendChild(img); //find the parent div and append the new div to it 
+            }
+
+            //here we start assigning the left side elements
+            var img = document.createElement('img'); //create the image element
+            img.setAttribute("id", "userimg"); //assign id to the img element
+            img.src = pull.avatar_url; //assign src to the img element which is the avatar url
+            if( document.getElementById("img").firstChild ){ //this checks if the parents div is empty if so append if not the replace the existing child
+                document.getElementById("img").replaceChild(img, document.getElementById("img").firstChild);
+            }else{
+                document.getElementById("img").appendChild(img);
+            }
+
+            var locationP = document.createElement('p'); //create the p element
+            locationP.setAttribute("id", "userlocation"); //assign the id to the p element
+            locationP.innerHTML = "Location: " + pull.location; //assign the text to be displayed and the location 
+            if( document.getElementById("location").firstChild ){ //this checks if the parents div is empty if so append if not the replace the existing child
+                document.getElementById("location").replaceChild(locationP, document.getElementById("location").firstChild);
+            }else{
+                document.getElementById("location").appendChild(img);
+            }
+
+            var nameP = document.createElement('p'); //create the p element
+            nameP.setAttribute("id", "usersname"); //assign the id to the p element
+            nameP.innerHTML = "Name: " + pull.name; //assignt the text to be displayed and the name
+            if( document.getElementById("name").firstChild ){//this checks if the parents div is empty if so append if not the replace the existing child
+                document.getElementById("name").replaceChild(nameP, document.getElementById("name").firstChild);
+            }else{
+                document.getElementById("name").appendChild(nameP);
+            }
+
+            var gitsP = document.createElement('p'); //create the p element
+            gitsP.setAttribute("id", "usergits"); //assign the id to the p element
+            gitsP.innerHTML = "Number of Gists: " + pull.public_gists; //assign the text
+            if( document.getElementById("gits").firstChild ){//this checks if the parents div is empty if so append if not the replace the existing child
+                document.getElementById("gits").replaceChild(gitsP, document.getElementById("gits").firstChild);
+            }else{
+                document.getElementById("gits").appendChild(gitsP);
+            }
+
+            var emailP = document.createElement('p'); //create the p element
+            emailP.setAttribute("id", "useremail"); //assign the id to the p element
+            emailP.innerHTML = "Email: " + pull.email; //assign the text
+            if( document.getElementById("email").firstChild ){//this checks if the parents div is empty if so append if not the replace the existing child
+                document.getElementById("email").replaceChild(emailP, document.getElementById("email").firstChild);
+            }else{
+                document.getElementById("email").appendChild(emailP);
+            }
+
+            var usernameP = document.createElement('p'); //create the p element
+            usernameP.setAttribute("id", "userusername"); //assign the id to the p element
+            usernameP.innerHTML = "Username: " + pull.login; //assign the text
+            if( document.getElementById("username").firstChild ){//this checks if the parents div is empty if so append if not the replace the existing child
+                document.getElementById("username").replaceChild(usernameP, document.getElementById("username").firstChild);
+            }else{
+                document.getElementById("username").appendChild(usernameP);
+            }
+        }
+    </script>
+</body>
+</html>
